@@ -1,5 +1,7 @@
-package com.example.demo.item.domain.dto;
+package com.example.demo.question.domain.dto;
 
+import com.example.demo.question.domain.Question;
+import com.example.demo.utill.InputType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,8 @@ public class UpdateItemQuestionDto {
 
     private int questionNo;
 
-    private String question;
+    private InputType inputType;
+
+    private Question question;
 
 }

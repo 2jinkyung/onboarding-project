@@ -1,9 +1,9 @@
 package com.example.demo.survey.service;
 
-import com.example.demo.item.domain.Item;
-import com.example.demo.item.Repository.ItemRepository;
-import com.example.demo.item.Repository.ItemaQuestionRepository;
-import com.example.demo.item.domain.ItemQuestion;
+import com.example.demo.question.domain.Question;
+import com.example.demo.question.Repository.ItemRepository;
+import com.example.demo.question.Repository.ItemaQuestionRepository;
+import com.example.demo.question.domain.QuestionType;
 import com.example.demo.survey.domain.dto.CreateSurveyDTO;
 import com.example.demo.survey.domain.dto.SurveyDto;
 import com.example.demo.survey.domain.dto.UpdateSurveyDTO;
@@ -38,7 +38,7 @@ public class SurveyService {
     public SurveyDto create(CreateSurveyDTO createSurveyDTO){
 
         if(createSurveyDTO.getItems().isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No items to create");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No questions to create");
         };
 
         Survey survey = surveyRepository.save(
@@ -46,28 +46,28 @@ public class SurveyService {
         );
 
         AtomicInteger num = new AtomicInteger(0);
-        List<Item> items = createSurveyDTO.getItems()
+        List<Question> questions = createSurveyDTO.getItems()
                             .stream()
                             .map(
                                     createItemDto ->{
-                                        Item item = createItemDto.toEntity();
-                                        item.setItemNo(num.getAndIncrement());
+                                        Question item = createItemDto.toEntity();
+//                                        item.setItemNo(num.getAndIncrement());
                                         itemRepository.save(item);
                                         // ItemQuestion이 있는 경우에만 질문 항목 저장
                                         if(createItemDto.getItemQuestionList() != null && createItemDto.getItemQuestionList().size() < 10){
-                                            item.setItemQuestion(
+                                            item.setQuestionType(
                                                     createItemDto.getItemQuestionList()
                                                             .stream()
                                                             .map( question ->{
-                                                                ItemQuestion itemQuestion = ItemQuestion.toEntity(question);
-                                                                itemQuestion.setItem(item);
-                                                                itemQuestion.setQuestionNo(num.getAndIncrement());
-                                                                return itemaQuestionRepository.save(itemQuestion);
+                                                                QuestionType questionType = QuestionType.toEntity(question);
+                                                                questionType.setQuestion(item);
+                                                                questionType.setInputType(question.getInputType());
+                                                                return itemaQuestionRepository.save(questionType);
                                                             }
                                                     ).collect(Collectors.toList())
                                             );
                                         }else {
-                                            item.setItemQuestion(Collections.emptyList());
+                                            item.setQuestionType(Collections.emptyList());
                                         }
                                         item.setSurvey(survey);
                                         return item;
@@ -76,7 +76,7 @@ public class SurveyService {
                             .collect(Collectors.toList());
 
 
-        survey.setItems(items);
+        survey.setQuestions(questions);
         return SurveyDto.fromSurvey(surveyRepository.save(survey));
     }
 
@@ -88,25 +88,25 @@ public class SurveyService {
     public SurveyDto update(Long surveyId,UpdateSurveyDTO updateSurveyDTO){
         // 설문지 찾기
         Survey updateSurvey = findSurvey(surveyId);
-        List<Item> item2= updateSurvey.getItems();
+        List<Question> question2 = updateSurvey.getQuestions();
 
         if(updateSurveyDTO.getItems() != null){
             // 질문 업데이트
             updateSurveyDTO.getItems().forEach(itemDto -> {
-                Item item = updateSurvey.getItems().stream()
-                        .filter(i -> Objects.equals(i.getItemNo(),itemDto.getItemNo()))
+                Question question = updateSurvey.getQuestions().stream()
+                        .filter(i -> Objects.equals(i.getSurvey().getSurveyId(),itemDto.getItemNo()))
                         .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("Item not found"));
-            item.updateItem(itemDto);
+                        .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+            question.updateItem(itemDto);
 
             //질문 항목 업데이트
                 itemDto.getItemQuestionList().forEach(itemQuestionDto -> {
                     if(itemQuestionDto.getQuestion() != null){
-                        ItemQuestion itemQuestion = item.getItemQuestion().stream()
-                                .filter(q -> q.getQuestionNo() == itemQuestionDto.getQuestionNo())
+                        QuestionType questionType = question.getQuestionType().stream()
+                                .filter(q -> q.getQuestionTypeId() == itemQuestionDto.getQuestionNo())
                                 .findFirst()
-                                .orElseThrow(() -> new IllegalArgumentException("ItemQuestion not found"));
-                        itemQuestion.updateItemQuestion(itemQuestionDto);
+                                .orElseThrow(() -> new IllegalArgumentException("QuestionType not found"));
+                        questionType.updateItemQuestion(itemQuestionDto);
                     }
                 });
             });

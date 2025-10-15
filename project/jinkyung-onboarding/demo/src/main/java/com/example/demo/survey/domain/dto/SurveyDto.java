@@ -1,6 +1,6 @@
 package com.example.demo.survey.domain.dto;
 
-import com.example.demo.item.domain.Item;
+import com.example.demo.question.domain.Question;
 import com.example.demo.survey.domain.Survey;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +22,7 @@ public class SurveyDto {
 
     private String description;
 
-    private List<Item> items;
+    private List<Question> questions;
 
     public static SurveyDto fromSurvey(Survey survey) {
         return SurveyDto.builder()

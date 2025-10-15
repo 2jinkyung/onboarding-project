@@ -1,7 +1,7 @@
 package com.example.demo.survey.domain.dto;
 
-import com.example.demo.item.domain.Item;
-import com.example.demo.item.domain.dto.UpdateItemDto;
+import com.example.demo.question.domain.Question;
+import com.example.demo.question.domain.dto.UpdateItemDto;
 import com.example.demo.survey.domain.Survey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,11 +23,11 @@ public class UpdateSurveyDTO {
 
     private List<UpdateItemDto> items;
 
-    public Survey toEntity(List<Item> items){
+    public Survey toEntity(List<Question> questions){
         return Survey.builder()
                 .name(this.name)
                 .description(this.description)
-                .items(items)
+                .questions(questions)
                 .build();
 
     }
