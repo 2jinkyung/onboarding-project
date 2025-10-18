@@ -35,8 +35,8 @@ public class SurveyService {
     private final ItemaQuestionRepository itemaQuestionRepository;
 
     // 설문조사 api 등록
-    public SurveyDto create(CreateSurveyDTO createSurveyDTO){
-
+    public Long create(CreateSurveyDTO createSurveyDTO){
+        log.info("--- Start ---"+System.currentTimeMillis());
         if(createSurveyDTO.getItems().isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No questions to create");
         };
@@ -77,7 +77,8 @@ public class SurveyService {
 
 
         survey.setQuestions(questions);
-        return SurveyDto.fromSurvey(surveyRepository.save(survey));
+        log.info("--- End ---"+System.currentTimeMillis());
+        return surveyRepository.save(survey).getSurveyId();
     }
 
     public Survey findSurvey(Long surveyId){

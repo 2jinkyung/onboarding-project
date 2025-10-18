@@ -48,10 +48,10 @@ class DemoApplicationTests {
 		
 		itemList.add(createItemDto1);
 		dto.setItems(itemList);
-		SurveyDto result = surveyService.create(dto);
+		Long result = surveyService.create(dto);
 
-		Survey survey= surveyService.findSurvey(result.getSurveyId());
-		Assertions.assertThat(result.getSurveyId()).isEqualTo(survey.getSurveyId());
+		Survey survey= surveyService.findSurvey(result);
+		Assertions.assertThat(result).isEqualTo(survey.getSurveyId());
 
 	}
 

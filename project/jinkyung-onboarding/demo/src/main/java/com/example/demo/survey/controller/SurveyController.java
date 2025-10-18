@@ -26,6 +26,7 @@ public class SurveyController {
             @Validated @RequestBody CreateSurveyDTO createSurveyDTO
     ) {
         return new ApiResponseTemplate<>(surveyService.create(createSurveyDTO),HttpStatus.OK);
+
     }
 
     //설문조사 수정
